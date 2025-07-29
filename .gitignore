@@ -1,0 +1,69 @@
+# Root level .gitignore for podalyze monorepo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.envs/.env*
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Monitoring data
+monitoring/data/
+monitoring/logs/
+
+# Nginx logs and temp files
+nginx/logs/
+nginx/temp/
+
+# Scripts temporary files
+scripts/temp/
+scripts/*.tmp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Build artifacts (if building at root level)
+dist/
+build/
+
+# Node modules at root (if any)
+node_modules/
+
+# Coverage reports
+coverage/
+.nyc_output/
