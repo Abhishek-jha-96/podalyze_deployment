@@ -1,0 +1,110 @@
+services:
+  frontend:
+    build:
+      context: ./services/podalyze
+      dockerfile: Dockerfile
+    container_name: podalyze_frontend
+    env_file:
+      - ./.envs/env.frontend
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+    networks:
+      - podalyze_net
+
+  backend:
+    build:
+      context: ./services/podalyze_backend
+      dockerfile: Dockerfile
+    container_name: podalyze_backend
+    env_file:
+      - ./.envs/env.backend
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - inference-server
+    networks:
+      - podalyze_net
+
+  inference-server:
+    build:
+      context: ./services/podalyze_inference
+      dockerfile: Dockerfile
+    container_name: podalyze_inference_server
+    env_file:
+      - ./.envs/env.inference
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    volumes:
+      - model_cache:/app/models
+      - inference_logs:/app/logs
+    depends_on:
+      - mongo
+    networks:
+      - podalyze_net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  mongo:
+    image: mongo:8.0.8
+    container_name: podalyze_mongo
+    restart: unless-stopped
+    env_file:
+      - ./.envs/env.db
+    volumes:
+      - mongo_data:/data/db
+      - ./backup:/backup
+    networks:
+      - podalyze_net
+    command: mongod --auth --bind_ip_all
+
+  nginx:
+    image: nginx:alpine
+    container_name: podalyze_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    networks:
+      - podalyze_net
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: podalyze_mongo_express
+    restart: unless-stopped
+    env_file:
+      - ./.envs/env.db
+    depends_on:
+      - mongo
+    networks:
+      - podalyze_net
+
+networks:
+  podalyze_net:
+    driver: bridge
+    name: podalyze_network
+
+volumes:
+  mongo_data:
+    driver: local
+  model_cache:
+    driver: local
+  inference_logs:
+    driver: local
+  nginx_logs:
+    driver: local
