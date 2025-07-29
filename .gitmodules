@@ -1,0 +1,20 @@
+[submodule "podalyze"]
+	path = services/podalyze
+	url = https://github.com/Abhishek-jha-96/podalyze.git
+
+[submodule "podalyze_backend"]
+	path = services/podalyze_backend
+	url = https://github.com/Abhishek-jha-96/podalyze_backend.git
+
+[submodule "podalyze_inference"]
+	path = services/podalyze_inference
+	url = https://github.com/Abhishek-jha-96/podalyze_inference.git
+[submodule "services/podalyze"]
+	path = services/podalyze
+	url = https://github.com/Abhishek-jha-96/podalyze.git
+[submodule "services/podalyze_backend"]
+	path = services/podalyze_backend
+	url = https://github.com/Abhishek-jha-96/podalyze_backend.git
+[submodule "services/podalyze_inference"]
+	path = services/podalyze_inference
+	url = https://github.com/Abhishek-jha-96/podalyze_inference.git
