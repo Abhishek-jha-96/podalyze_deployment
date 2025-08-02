@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: podalyze_frontend
     env_file:
-      - ./.envs/env.frontend
+      - ./.envs/.env.frontend
     ports:
       - "5173:5173"
     restart: unless-stopped
@@ -18,7 +18,7 @@ services:
       dockerfile: Dockerfile
     container_name: podalyze_backend
     env_file:
-      - ./.envs/env.backend
+      - ./.envs/.env.backend
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -34,7 +34,7 @@ services:
       dockerfile: Dockerfile
     container_name: podalyze_inference_server
     env_file:
-      - ./.envs/env.inference
+      - ./.envs/.env.inference
     ports:
       - "8000:8000"
     restart: unless-stopped
@@ -58,7 +58,7 @@ services:
     container_name: podalyze_mongo
     restart: unless-stopped
     env_file:
-      - ./.envs/env.db
+      - ./.envs/.env.mongo
     volumes:
       - mongo_data:/data/db
       - ./backup:/backup
@@ -88,7 +88,7 @@ services:
     container_name: podalyze_mongo_express
     restart: unless-stopped
     env_file:
-      - ./.envs/env.db
+      - ./.envs/.env.mongo
     depends_on:
       - mongo
     networks:
