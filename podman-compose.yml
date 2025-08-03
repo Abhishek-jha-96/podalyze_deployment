@@ -45,13 +45,6 @@ services:
       - mongo
     networks:
       - podalyze_net
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
 
   mongo:
     image: mongo:8.0.8
@@ -70,8 +63,7 @@ services:
     image: nginx:alpine
     container_name: podalyze_nginx
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:8080"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
