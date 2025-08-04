@@ -3,6 +3,8 @@ services:
     build:
       context: ./services/podalyze
       dockerfile: Dockerfile
+      args:
+        - VITE_BASE_API_URL=${VITE_BASE_API_URL}
     container_name: podalyze_frontend
     env_file:
       - ./.envs/.env.production
