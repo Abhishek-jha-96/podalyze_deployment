@@ -3,9 +3,13 @@ services:
     build:
       context: ./services/podalyze
       dockerfile: Dockerfile
+      args:
+        - VITE_BASE_API_URL=${VITE_BASE_API_URL}
     container_name: podalyze_frontend
     env_file:
-      - ./.envs/.env.frontend
+      - ./.envs/.env.production
+    environment:
+      - ENVIRONMENT=production
     ports:
       - "5173:5173"
     restart: unless-stopped
@@ -18,7 +22,7 @@ services:
       dockerfile: Dockerfile
     container_name: podalyze_backend
     env_file:
-      - ./.envs/.env.backend
+      - ./.envs/.env.production
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -34,7 +38,7 @@ services:
       dockerfile: Dockerfile
     container_name: podalyze_inference_server
     env_file:
-      - ./.envs/.env.inference
+      - ./.envs/.env.production
     ports:
       - "8000:8000"
     restart: unless-stopped
@@ -51,7 +55,7 @@ services:
     container_name: podalyze_mongo
     restart: unless-stopped
     env_file:
-      - ./.envs/.env.mongo
+      - ./.envs/.env.production
     volumes:
       - mongo_data:/data/db
       - ./backup:/backup
@@ -80,7 +84,7 @@ services:
     container_name: podalyze_mongo_express
     restart: unless-stopped
     env_file:
-      - ./.envs/.env.mongo
+      - ./.envs/.env.production
     depends_on:
       - mongo
     networks:
