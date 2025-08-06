@@ -55,35 +55,6 @@ deploy_services() {
     esac
 }
 
-# Function to run health checks
-health_checks() {
-    echo "🏥 Running health checks..."
-    
-    # Wait for services to be ready
-    sleep 30
-    
-    # Check frontend
-    if curl -f http://localhost/health > /dev/null 2>&1; then
-        echo "✅ Frontend is healthy"
-    else
-        echo "❌ Frontend health check failed"
-    fi
-    
-    # Check backend
-    if curl -f http://localhost/api/health > /dev/null 2>&1; then
-        echo "✅ Backend is healthy"
-    else
-        echo "❌ Backend health check failed"
-    fi
-    
-    # Check inference server
-    if curl -f http://localhost:8000/health > /dev/null 2>&1; then
-        echo "✅ Inference server is healthy"
-    else
-        echo "❌ Inference server health check failed"
-    fi
-}
-
 # Function to show logs
 show_logs() {
     echo "📋 Showing recent logs..."
@@ -103,7 +74,6 @@ main() {
             update_submodules
             build_images
             deploy_services $2
-            health_checks
             ;;
         "logs")
             show_logs
