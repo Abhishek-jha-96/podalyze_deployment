@@ -11,19 +11,19 @@ git pull origin main
 
 # Update submodules to latest commits on their main branches
 echo "📦 Updating frontend..."
-cd services/frontend
+cd services/podalyze
 git checkout main
 git pull origin main
 cd ../..
 
 echo "📦 Updating backend..."
-cd services/backend
+cd services/podalyze_backend
 git checkout main  
 git pull origin main
 cd ../..
 
 echo "📦 Updating inference server..."
-cd services/inference-server
+cd services/podalyze_inference
 git checkout main
 git pull origin main
 cd ../..
