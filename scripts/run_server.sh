@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# scripts/run_server.sh — root-level Docker Compose control for all Podalyze services
 
 set -euo pipefail
 
