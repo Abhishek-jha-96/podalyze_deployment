@@ -1,18 +1,42 @@
 services:
-
   frontend:
     build:
       context: ./services/podalyze
       dockerfile: Dockerfile
-      target: dev
+      target: prod
+      args:
+        VITE_BASE_API_URL: ${VITE_BASE_API_URL}
+    container_name: podalyze_frontend
     env_file:
-      - ./.envs/.env.development
-    command: pnpm run dev
+      - ./.envs/.env.production
+    environment:
+      - ENVIRONMENT=production
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+    profiles:
+      - prod
+    networks:
+      - podalyze_net
+
+  frontend-dev:
+    build:
+      context: ./services/podalyze
+      dockerfile: Dockerfile
+      target: dev
+    container_name: podalyze_frontend_dev
+    env_file:
+      - ./.envs/.env.production
+    environment:
+      - ENVIRONMENT=development
     volumes:
       - ./services/podalyze:/home/appuser/app:Z
       - /home/appuser/app/node_modules
     ports:
       - "5173:5173"
+    restart: unless-stopped
+    profiles:
+      - dev
     networks:
       - podalyze_net
 
@@ -20,14 +44,12 @@ services:
     build:
       context: ./services/podalyze_backend
       dockerfile: Dockerfile
-      target: development
-    command: pnpm run dev
+    container_name: podalyze_backend
     env_file:
-      - ./.envs/.env.development
-    volumes:
-      - ./services/podalyze_backend:/app:Z
+      - ./.envs/.env.production
     ports:
       - "3000:3000"
+    restart: unless-stopped
     depends_on:
       - mongo
       - inference-server
@@ -39,14 +61,15 @@ services:
     build:
       context: ./services/podalyze_inference
       dockerfile: Dockerfile
+    container_name: podalyze_inference_server
     env_file:
-      - ./.envs/.env.development
+      - ./.envs/.env.production
     ports:
       - "8000:8000"
+    restart: unless-stopped
     volumes:
-      - ./services/podalyze_inference:/src:Z
-      - model_cache:/src/models
-      - inference_logs:/src/logs
+      - model_cache:/app/models
+      - inference_logs:/app/logs
     depends_on:
       - mongo
       - redis
@@ -57,10 +80,10 @@ services:
     build:
       context: ./services/podalyze_inference
       dockerfile: Dockerfile
+    container_name: podalyze_celery
     env_file:
-      - ./.envs/.env.development
-    volumes:
-      - ./services/podalyze_inference:/src:Z
+      - ./.envs/.env.production
+    restart: unless-stopped
     depends_on:
       - redis
       - mongo
@@ -70,6 +93,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    container_name: podalyze_redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -78,9 +102,10 @@ services:
 
   mongo:
     image: mongo:8.0.8
+    container_name: podalyze_mongo
     restart: unless-stopped
     env_file:
-      - ./.envs/.env.development
+      - ./.envs/.env.production
     ports:
       - "27017:27017"
     volumes:
@@ -92,9 +117,10 @@ services:
 
   mongo-express:
     image: mongo-express:latest
+    container_name: podalyze_mongo_express
     restart: unless-stopped
     env_file:
-      - ./.envs/.env.development
+      - ./.envs/.env.production
     ports:
       - "8081:8081"
     depends_on:
