@@ -35,7 +35,7 @@ update_submodules() {
 # Function to build images
 build_images() {
     echo "🔨 Building Docker images..."
-    docker-compose build --no-cache
+    docker compose -f docker-compose.yml --env-file .envs/.env.production build --no-cache
 }
 
 # Function to deploy services
@@ -44,13 +44,13 @@ deploy_services() {
     
     case $1 in
         "dev")
-            docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+            ./scripts/run_server.sh dev
             ;;
         "prod")
-            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+            ./scripts/run_server.sh up
             ;;
         *)
-            docker-compose up -d
+            ./scripts/run_server.sh up
             ;;
     esac
 }
@@ -58,7 +58,7 @@ deploy_services() {
 # Function to show logs
 show_logs() {
     echo "📋 Showing recent logs..."
-    docker-compose logs --tail=50
+    docker compose -f docker-compose.yml --env-file .envs/.env.production logs --tail=50
 }
 
 # Main deployment flow
@@ -80,7 +80,7 @@ main() {
             ;;
         "cleanup")
             echo "🧹 Cleaning up..."
-            docker-compose down
+            ./scripts/run_server.sh down
             docker system prune -f
             ;;
         *)

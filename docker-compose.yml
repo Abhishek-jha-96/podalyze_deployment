@@ -1,0 +1,134 @@
+services:
+
+  frontend:
+    build:
+      context: ./services/podalyze
+      dockerfile: Dockerfile
+      target: dev
+    env_file:
+      - ./.envs/.env.development
+    command: pnpm run dev
+    volumes:
+      - ./services/podalyze:/home/appuser/app:Z
+      - /home/appuser/app/node_modules
+    ports:
+      - "5173:5173"
+    networks:
+      - podalyze_net
+
+  backend:
+    build:
+      context: ./services/podalyze_backend
+      dockerfile: Dockerfile
+      target: development
+    command: pnpm run dev
+    env_file:
+      - ./.envs/.env.development
+    volumes:
+      - ./services/podalyze_backend:/app:Z
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+      - inference-server
+      - redis
+    networks:
+      - podalyze_net
+
+  inference-server:
+    build:
+      context: ./services/podalyze_inference
+      dockerfile: Dockerfile
+    env_file:
+      - ./.envs/.env.development
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./services/podalyze_inference:/src:Z
+      - model_cache:/src/models
+      - inference_logs:/src/logs
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - podalyze_net
+
+  celery:
+    build:
+      context: ./services/podalyze_inference
+      dockerfile: Dockerfile
+    env_file:
+      - ./.envs/.env.development
+    volumes:
+      - ./services/podalyze_inference:/src:Z
+    depends_on:
+      - redis
+      - mongo
+    command: python3 -m celery -A src.config.celery.app worker --loglevel=INFO
+    networks:
+      - podalyze_net
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - podalyze_net
+
+  mongo:
+    image: mongo:8.0.8
+    restart: unless-stopped
+    env_file:
+      - ./.envs/.env.development
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./backup:/backup
+    networks:
+      - podalyze_net
+    command: mongod --auth --bind_ip_all
+
+  mongo-express:
+    image: mongo-express:latest
+    restart: unless-stopped
+    env_file:
+      - ./.envs/.env.development
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+    networks:
+      - podalyze_net
+
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: podalyze_nginx
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./nginx/ssl:/etc/nginx/ssl:ro
+  #     - nginx_logs:/var/log/nginx
+  #   depends_on:
+  #     - frontend
+  #     - backend
+  #   restart: unless-stopped
+  #   networks:
+  #     - podalyze_net
+
+networks:
+  podalyze_net:
+    driver: bridge
+    name: podalyze_network
+
+volumes:
+  mongo_data:
+    driver: local
+  model_cache:
+    driver: local
+  inference_logs:
+    driver: local
+  nginx_logs:
+    driver: local
