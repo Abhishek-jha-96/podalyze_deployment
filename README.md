@@ -15,24 +15,24 @@ Podalyze is split into three cooperating services (plus shared infra):
 
 ```
 ┌─────────────┐      ┌──────────────────┐      ┌───────────────────────┐
-│   React UI  │─────▶│  NestJS Backend  │─────▶│  FastAPI Inference API │
-│ (dashboard, │      │ (auth, CRUD,     │      │ (request validation,   │
-│  analytics) │◀─────│  podcast data)   │◀─────│  triggers Celery task)│
+│   React UI  │────▶│  NestJS Backend  │────▶│ FastAPI Inference API │
+│ (dashboard, │      │ (auth, CRUD,     │      │ (request validation,  │
+│  analytics) │◀────│  podcast data)   │◀────│ triggers Celery task) │
 └─────────────┘      └──────────────────┘      └───────────┬───────────┘
-                              │                             │
-                              ▼                             ▼
+                              │                            │
+                              ▼                            ▼
                         ┌──────────┐               ┌─────────────────┐
-                        │ MongoDB  │               │  Celery Worker   │
-                        │(Mongoose)│               │  (async task)    │
-                        └──────────┘               └────────┬─────────┘
-                                                              │
-                                        ┌─────────────────────┼─────────────────────┐
-                                        ▼                     ▼                     ▼
+                        │ MongoDB  │               │  Celery Worker  │
+                        │(Mongoose)│               │  (async task)   │
+                        └──────────┘               └────────┬────────┘
+                                                            │
+                                      ┌─────────────────────┼─────────────────────┐
+                                      ▼                     ▼                     ▼
                                  ┌─────────────┐      ┌───────────────┐     ┌───────────────┐
-                                 │ YouTube API │      │ NLP Inference │     │ Custom Model   │
-                                 │ (metadata + │      │ (genre/       │     │ (XGBoost +     │
-                                 │  transcript)│      │  sentiment,   │     │  CatBoost:     │
-                                 │             │      │  HF Inference)│     │  watch time)   │
+                                 │ YouTube API │      │ NLP Inference │     │ Custom Model  │
+                                 │ (metadata + │      │ (genre/       │     │ (XGBoost +    │
+                                 │  transcript)│      │  sentiment,   │     │  CatBoost:    │
+                                 │             │      │  HF Inference)│     │  watch time)  │
                                  └─────────────┘      └───────────────┘     └───────────────┘
 ```
 
@@ -44,6 +44,17 @@ Podalyze is split into three cooperating services (plus shared infra):
    - **NLP inference** — sentiment (RoBERTa) and genre (BART zero-shot) via Hugging Face Inference.
    - **Custom model inference** — average watch time prediction via XGBoost + CatBoost, using features like total length, host/guest popularity, ads, and genre.
 5. Results are persisted back to MongoDB (task/project updates) and surfaced on the analytics dashboard.
+
+## 🎥 Demo
+
+<div>
+   <a href="https://www.loom.com/share/5843eae483b347cd8c9a1f23ef617704">
+      <p>Podalyze Demo, Podcast Analysis Pipeline Overview - Watch Video</p>
+   </a>
+   <a href="https://www.loom.com/share/5843eae483b347cd8c9a1f23ef617704">
+   <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/5843eae483b347cd8c9a1f23ef617704-8376b9aff554790e-full-play.gif#t=0.1">
+   </a>
+</div>
 
 ## Tech Stack
 
